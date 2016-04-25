@@ -24,7 +24,7 @@ func NewRouter() *mux.Router {
 
         handler = route.HandlerFunc
         handler = utils.Logger(handler, route.Name)
-
+        
 		router.
 			Methods(route.Method).
 			Path(route.Pattern).
@@ -42,5 +42,19 @@ var routes = Routes{
 		"GET",
 		"/",
 		handlers.Index,
+	},
+
+	Route{
+		"SignIn",
+		"GET",
+		"/signin",
+		handlers.SignIn,
+	},
+
+	Route{
+		"SignIn",
+		"POST",
+		"/signin",
+		handlers.SignIn,
 	},
 }

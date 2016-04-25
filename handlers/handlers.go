@@ -3,12 +3,23 @@ package handlers
 import (
 	"net/http"
 	"html/template"
-	"path"
 )
 
 func Index(w http.ResponseWriter, r *http.Request){
-	tmplpath := path.Join("templates", "index.html")
-    tmpl, _ := template.ParseFiles(tmplpath)
+    tmpl, _ := template.ParseFiles("templates/base.html", "templates/index.html")
     tmpl.Execute(w, nil)
-	//fmt.Fprintf(w, "Batian 0.0.1")
+}
+
+func SignIn(w http.ResponseWriter, r *http.Request){
+	switch r.Method{
+		case "GET":
+			tmpl, _ := template.ParseFiles("templates/base.html", "templates/signin.html")
+			tmpl.Execute(w, nil)
+		case "POST":
+			//r.ParseForm()
+			//r.Form.Get("username")
+			tmpl, _ := template.ParseFiles("templates/base.html", "templates/signin.html")
+			tmpl.Execute(w, nil)
+	}
+	
 }
