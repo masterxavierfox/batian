@@ -1,10 +1,14 @@
 package handlers
 
 import (
-	"fmt"
 	"net/http"
+	"html/template"
+	"path"
 )
 
 func Index(w http.ResponseWriter, r *http.Request){
-	fmt.Fprintf(w, "Batian 0.0.1")
+	tmplpath := path.Join("templates", "index.html")
+    tmpl, _ := template.ParseFiles(tmplpath)
+    tmpl.Execute(w, nil)
+	//fmt.Fprintf(w, "Batian 0.0.1")
 }
