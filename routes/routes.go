@@ -45,16 +45,9 @@ var routes = Routes{
 	},
 
 	Route{
-		"SignIn",
-		"GET",
-		"/signin",
-		handlers.SignIn,
-	},
-
-	Route{
-		"SignIn",
+		"Log",
 		"POST",
-		"/signin",
-		handlers.SignIn,
+		"/log",
+		handlers.Log,
 	},
 }
