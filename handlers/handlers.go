@@ -23,7 +23,7 @@ func Log(w http.ResponseWriter, r *http.Request){
 		w.WriteHeader(500)
 	}
 
-	models.Insert(log)
+	log.Save()
 	
 	w.WriteHeader(200)
 }

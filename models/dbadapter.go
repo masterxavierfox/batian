@@ -15,7 +15,7 @@ func Init(){
 	session.SetMode(mgo.Monotonic, true)
 }
 
-func Insert(log Log){
+func Insert(log *Log){
 	sessionCopy := session.Copy()
 	defer sessionCopy.Close()
 
