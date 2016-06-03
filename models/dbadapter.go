@@ -19,7 +19,7 @@ func Insert(event *Event){
 	sessionCopy := session.Copy()
 	defer sessionCopy.Close()
 
-	collection := session.DB("batian").C("logs")
+	collection := session.DB("batian").C("events")
 
 	err := collection.Insert(&event)
 
