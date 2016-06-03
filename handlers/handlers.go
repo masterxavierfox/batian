@@ -13,17 +13,17 @@ func Index(w http.ResponseWriter, r *http.Request){
     tmpl.Execute(w, nil)
 }
 
-func Log(w http.ResponseWriter, r *http.Request){
+func Event(w http.ResponseWriter, r *http.Request){
 	decoder := json.NewDecoder(r.Body)
-	var log models.Log
-	err := decoder.Decode(&log)
+	var event models.Event
+	err := decoder.Decode(&event)
 
 	if err != nil {
 		panic(err)
 		w.WriteHeader(500)
 	}
 
-	log.Save()
+	event.Save()
 	
 	w.WriteHeader(200)
 }

@@ -15,13 +15,13 @@ func Init(){
 	session.SetMode(mgo.Monotonic, true)
 }
 
-func Insert(log *Log){
+func Insert(event *Event){
 	sessionCopy := session.Copy()
 	defer sessionCopy.Close()
 
-	collection := session.DB("test").C("logs")
+	collection := session.DB("batian").C("logs")
 
-	err := collection.Insert(&log)
+	err := collection.Insert(&event)
 
 	if err != nil {
 		panic(err)

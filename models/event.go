@@ -9,13 +9,14 @@ type Model interface {
 	Save() bool
 }
 
-type Log struct {
+type Event struct {
+	Source		string
 	Measurement	string
 	Timestamp	time.Time
-	Data	bson.M	`bson:",inline"`
+	Data	bson.M	`json:"data"`
 }
 
-func (l *Log) Save() bool {
-	Insert(l)
+func (e *Event) Save() bool {
+	Insert(e)
 	return true
 }

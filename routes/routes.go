@@ -45,9 +45,9 @@ var routes = Routes{
 	},
 
 	Route{
-		"Log",
+		"Event",
 		"POST",
-		"/log",
-		handlers.Log,
+		"/event",
+		handlers.Event,
 	},
 }
