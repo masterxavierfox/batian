@@ -11,4 +11,4 @@ before_install:
   - go get github.com/go-playground/overalls
 script:
   - $HOME/gopath/bin/overalls -project=github.com/ishuah/batian -covermode=count -debug
-  - $HOME/gopath/bin/goveralls -service=travis-ci
+  - $HOME/gopath/bin/goveralls -service=travis-ci -coverprofile=overalls.coverprofile
