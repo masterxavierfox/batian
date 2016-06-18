@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"github.com/gorilla/mux"
 	"github.com/ishuah/batian/utils"
+	"github.com/ishuah/batian/models"
 	"github.com/ishuah/batian/handlers"
 )
 
@@ -16,7 +17,7 @@ type Route struct {
 
 type Routes []Route
 
-func NewRouter() *mux.Router {
+func NewRouter(routes Routes) *mux.Router {
 	router := mux.NewRouter().StrictSlash(true)
 
 	for _, route := range routes {
@@ -24,7 +25,6 @@ func NewRouter() *mux.Router {
 
         handler = route.HandlerFunc
         handler = utils.Logger(handler, route.Name)
-        
 		router.
 			Methods(route.Method).
 			Path(route.Pattern).
@@ -36,18 +36,20 @@ func NewRouter() *mux.Router {
 	return router
 }
 
-var routes = Routes{
-	Route{
-		"Index",
-		"GET",
-		"/",
-		handlers.Index,
-	},
+func BuildRoutes(db *models.DbManager) Routes {
+	return Routes{
+			Route{
+				"Index",
+				"GET",
+				"/",
+				handlers.Index,
+			},
 
-	Route{
-		"Event",
-		"POST",
-		"/event",
-		handlers.Event,
-	},
+			Route{
+				"Event",
+				"POST",
+				"/event",
+				handlers.Event(db),
+			},
+		}
 }

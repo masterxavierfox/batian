@@ -1,16 +1,16 @@
 package main
 
 import (
+	"github.com/ishuah/batian/models"
+	"github.com/ishuah/batian/routes"
 	"log"
 	"net/http"
-	"github.com/ishuah/batian/routes"
-	"github.com/ishuah/batian/models"
 )
 
-
 func main() {
-	router := routes.NewRouter()
-	models.Init()
-	
+	db, _ := models.NewDbManager("batian.db")
+	allroutes := routes.BuildRoutes(db)
+	router := routes.NewRouter(allroutes)
+
 	log.Fatal(http.ListenAndServe(":5000", router))
 }

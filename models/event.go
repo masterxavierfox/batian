@@ -15,8 +15,3 @@ type Event struct {
 	Timestamp	time.Time
 	Data	bson.M	`json:"data"`
 }
-
-func (e *Event) Save() bool {
-	Insert(e)
-	return true
-}
