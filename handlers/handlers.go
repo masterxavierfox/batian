@@ -17,16 +17,33 @@ func Index(w http.ResponseWriter, r *http.Request){
     tmpl.Execute(w, nil)
 }
 
-func Event(db *models.DbManager) http.HandlerFunc {
+func NewEvent(db *models.DbManager) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		decoder := json.NewDecoder(r.Body)
 		var event models.Event
 		err := decoder.Decode(&event)
 
 		if err != nil {
-			panic(err)
-			w.WriteHeader(500)
+			http.Error(w, err.Error(), 500)
 		}
+
+		err = db.NewEvent(event)
+
+		if err != nil {
+			http.Error(w, err.Error(), 500)
+		}
+
 		w.WriteHeader(200)
 	})
+}
+
+func AllEvents(db *models.DbManager) http.HandlerFunc {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		events,err := db.AllEvents()
+		if err != nil {
+			http.Error(w, err.Error(), 500)
+		}
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(events)
+		})
 }

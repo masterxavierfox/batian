@@ -46,10 +46,17 @@ func BuildRoutes(db *models.DbManager) Routes {
 			},
 
 			Route{
-				"Event",
+				"NewEvent",
 				"POST",
 				"/event",
-				handlers.Event(db),
+				handlers.NewEvent(db),
+			},
+
+			Route{
+				"AllEvents",
+				"GET",
+				"/event",
+				handlers.AllEvents(db),
 			},
 		}
 }

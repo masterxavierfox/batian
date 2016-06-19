@@ -10,8 +10,11 @@ type Model interface {
 }
 
 type Event struct {
+	ID			int
 	Source		string
 	Measurement	string
 	Timestamp	time.Time
 	Data	bson.M	`json:"data"`
 }
+
+type Events []Event
