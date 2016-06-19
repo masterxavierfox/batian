@@ -25,12 +25,14 @@ func NewEvent(db *models.DbManager) http.HandlerFunc {
 
 		if err != nil {
 			http.Error(w, err.Error(), 500)
+			return
 		}
 
 		err = db.NewEvent(event)
 
 		if err != nil {
 			http.Error(w, err.Error(), 500)
+			return
 		}
 
 		w.WriteHeader(200)
@@ -42,6 +44,7 @@ func AllEvents(db *models.DbManager) http.HandlerFunc {
 		events,err := db.AllEvents()
 		if err != nil {
 			http.Error(w, err.Error(), 500)
+			return
 		}
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(events)
