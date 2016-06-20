@@ -32,30 +32,24 @@ func NewRouter(routes Routes) *mux.Router {
 			Handler(handler)
 	}
 	//Serve static files
-	router.PathPrefix("/").Handler(http.FileServer(http.Dir("./static/")))
+	//router.PathPrefix("/").Handler(http.FileServer(http.Dir("./static/")))
 	return router
 }
 
 func BuildRoutes(db *models.DbManager) Routes {
 	return Routes{
-			Route{
-				"Index",
-				"GET",
-				"/",
-				handlers.Index,
-			},
 
 			Route{
 				"NewEvent",
 				"POST",
-				"/event",
+				"/api/v1/event",
 				handlers.NewEvent(db),
 			},
 
 			Route{
 				"AllEvents",
 				"GET",
-				"/event",
+				"/api/v1/event",
 				handlers.AllEvents(db),
 			},
 		}

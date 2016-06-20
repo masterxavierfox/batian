@@ -4,10 +4,6 @@ import (
 	"testing"
 )
 
-func TestIndex(t *testing.T){
-	t.Skip()
-}
-
 func TestNewEvent(t *testing.T){
 	t.Skip()
 }
