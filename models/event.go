@@ -10,10 +10,10 @@ type Model interface {
 }
 
 type Event struct {
-	ID			int
-	Source		string
-	Measurement	string
-	Timestamp	time.Time
+	ID			bson.ObjectId `storm:"id"`
+	Source		string `storm:"index"`
+	Measurement	string `storm:"index"`
+	Timestamp	time.Time `storm:"index"`
 	Data	bson.M	`json:"data"`
 }
 

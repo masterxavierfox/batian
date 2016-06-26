@@ -1,7 +1,6 @@
 package models
 
 import (
-	"github.com/boltdb/bolt"
 	"gopkg.in/mgo.v2/bson"
 	"io/ioutil"
 	"testing"
@@ -18,19 +17,6 @@ func TestNewDbManager(t *testing.T) {
 	m, err := NewDbManager(tempDb)
 	if err != nil {
 		t.Errorf("Error when calling NewDbManager: %v", err)
-	}
-
-	createdEventsBucket := false
-	m.db.View(func(tx *bolt.Tx) error {
-		b := tx.Bucket([]byte("events"))
-		if b != nil {
-			createdEventsBucket = true
-		}
-		return nil
-	})
-
-	if !createdEventsBucket {
-		t.Errorf("'events' bucket does not exist")
 	}
 
 	m.Close()
@@ -51,7 +37,7 @@ func TestNewEvent(t *testing.T) {
 	}
 
 	var event = Event{
-		1,
+		bson.NewObjectId(),
 		"batian.io",
 		"requests",
 		time.Now(),
@@ -82,7 +68,7 @@ func TestAllEvents(t *testing.T) {
 	m, err := NewDbManager(tempDb)
 
 	event1 := Event{
-		1,
+		bson.NewObjectId(),
 		"batian.io",
 		"requests",
 		time.Now(),
@@ -95,7 +81,7 @@ func TestAllEvents(t *testing.T) {
 	}
 
 	event2 := Event{
-		2,
+		bson.NewObjectId(),
 		"batian.io",
 		"queries",
 		time.Now(),

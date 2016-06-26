@@ -1,28 +1,17 @@
 package models
 
 import (
-	"github.com/boltdb/bolt"
+	"github.com/asdine/storm"
 	"encoding/binary"
-	"encoding/json"
+	"gopkg.in/mgo.v2/bson"
 )
 
 type DbManager struct {
-	db *bolt.DB
+	db *storm.DB
 }
 
 func NewDbManager(path string) (*DbManager, error) {
-	db, err := bolt.Open(path, 0644, nil)
-	if err != nil {
-		return nil, err
-	}
-	err = db.Update(func(tx *bolt.Tx) error {
-		_, err := tx.CreateBucketIfNotExists([]byte("events"))
-		if err != nil {
-			return err
-		}
-		return err
-	})
-
+	db, err := storm.Open(path)
 	if err != nil {
 		return nil, err
 	}
@@ -34,37 +23,15 @@ func (m *DbManager) Close() error {
 }
 
 func (m *DbManager) NewEvent(event Event) error {
-	err := m.db.Update(func(tx *bolt.Tx) error {
-		b := tx.Bucket([]byte("events"))
-		id, _ := b.NextSequence()
-		event.ID = int(id)
-		buf, err := json.Marshal(event)
-		if err != nil {
-			return err
-		}
-		return b.Put(itob(event.ID), buf)
-			
-	})
+	event.ID = bson.NewObjectId()
+	err := m.db.Save(&event)
 	return err
 }
 
 func (m *DbManager) AllEvents() (Events, error) {
 	var events Events
-	var event Event
-	err := m.db.View(func(tx *bolt.Tx) error {
-		b := tx.Bucket([]byte("events"))
-		cur := b.Cursor()
+	err := m.db.AllByIndex("Timestamp", &events)
 
-		for k, v := cur.First(); k != nil; k, v = cur.Next() {
-			err := json.Unmarshal(v, &event)
-			if err != nil {
-				return err
-			}
-			events = append(events, event)
-		}
-
-		return nil
-	})
 	if err != nil {
 		return nil, err
 	}
