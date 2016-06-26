@@ -2,7 +2,6 @@ package models
 
 import (
 	"github.com/asdine/storm"
-	"encoding/binary"
 	"gopkg.in/mgo.v2/bson"
 )
 
@@ -12,6 +11,7 @@ type DbManager struct {
 
 func NewDbManager(path string) (*DbManager, error) {
 	db, err := storm.Open(path)
+	db.Init(&Event{})
 	if err != nil {
 		return nil, err
 	}
@@ -24,7 +24,11 @@ func (m *DbManager) Close() error {
 
 func (m *DbManager) NewEvent(event Event) error {
 	event.ID = bson.NewObjectId()
-	err := m.db.Save(&event)
+	err := event.Validate()
+	if err != nil {
+		return err
+	}
+	err = m.db.Save(&event)
 	return err
 }
 
@@ -36,10 +40,4 @@ func (m *DbManager) AllEvents() (Events, error) {
 		return nil, err
 	}
 	return events, nil
-}
-
-func itob(v int) []byte {
-    b := make([]byte, 8)
-    binary.BigEndian.PutUint64(b, uint64(v))
-    return b
 }
