@@ -20,8 +20,17 @@ type Event struct {
 
 type Events []Event
 
+func InitEvent() Event {
+	return Event{ ID: bson.NewObjectId() }
+}
+
 func (event *Event) Validate() error {
 	var message string
+
+	if event.ID == "" {
+		return errors.New("Error: uninitialized event")
+	}
+
 	if event.Source == "" {
 		message += " source field "
 	}

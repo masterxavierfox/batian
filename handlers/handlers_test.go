@@ -5,9 +5,7 @@ import (
 	"net/http/httptest"
 	"net/http"
 	"github.com/ishuah/batian/models"
-	//"gopkg.in/mgo.v2/bson"
 	"os"
-	//"time"
 	"strings"
 	"io/ioutil"
 )
@@ -20,7 +18,16 @@ func TestNewEvent(t *testing.T){
 	db, _ := models.NewDbManager(tempDb)
 	newEvent := NewEvent(db)
 
-	var goodParams = `{ "source":"brandsight.com", "measurement": "exceptions", "timestamp": "2016-06-14T13:55:01.000Z", "data": { "status_code": 500, "message": "Does not compute", "path": "/ap1/v1/projects", "method": "GET" }}`
+	var goodParams = `{ "source":"brandsight.com", 
+						"measurement": "exceptions", 
+						"timestamp": "2016-06-14T13:55:01.000Z", 
+						"data": { 
+							"status_code": 500, 
+							"message": "Does not compute", 
+							"path": "/ap1/v1/projects", 
+							"method": "GET" 
+							} 
+						}`
 
 	var malformedParams = `{ "invalid":"fields" }`
 
@@ -29,7 +36,7 @@ func TestNewEvent(t *testing.T){
 	newEvent(response, request)
 
 	if response.Code != http.StatusInternalServerError {
-		t.Fatalf("Non-expected status code%v:\n\tbody: %v ", "500", response.Code)
+		t.Fatalf("Non-expected status code %v:\n\tbody: %v ", "500", response.Code)
 	}
 
 	request, response = generateRequest("POST", "/api/v1/event", goodParams)
@@ -37,7 +44,7 @@ func TestNewEvent(t *testing.T){
 	newEvent(response, request)
 	
 	if response.Code != http.StatusOK {
-		t.Fatalf("Non-expected status code%v:\n\tbody: %v ", "200", response.Code)
+		t.Fatalf("Non-expected status code %v:\n\tbody: %v ", "200", response.Code)
 	}
 
 	db.Close()

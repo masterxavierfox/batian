@@ -2,7 +2,6 @@ package models
 
 import (
 	"github.com/asdine/storm"
-	"gopkg.in/mgo.v2/bson"
 )
 
 type DbManager struct {
@@ -23,7 +22,6 @@ func (m *DbManager) Close() error {
 }
 
 func (m *DbManager) NewEvent(event Event) error {
-	event.ID = bson.NewObjectId()
 	err := event.Validate()
 	if err != nil {
 		return err
