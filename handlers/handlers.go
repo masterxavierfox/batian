@@ -9,7 +9,7 @@ import (
 func NewEvent(db *models.DbManager) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		decoder := json.NewDecoder(r.Body)
-		var event models.Event
+		event := models.InitEvent()
 		err := decoder.Decode(&event)
 
 		if err != nil {

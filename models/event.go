@@ -2,6 +2,7 @@ package models
 
 import (
 	"time"
+	"errors"
 	"gopkg.in/mgo.v2/bson"
 	)
 
@@ -10,11 +11,44 @@ type Model interface {
 }
 
 type Event struct {
-	ID			int
-	Source		string
-	Measurement	string
-	Timestamp	time.Time
+	ID			bson.ObjectId `storm:"id"`
+	Source		string `storm:"index"`
+	Measurement	string `storm:"index"`
+	Timestamp	time.Time `storm:"index"`
 	Data	bson.M	`json:"data"`
 }
 
 type Events []Event
+
+func InitEvent() Event {
+	return Event{ ID: bson.NewObjectId() }
+}
+
+func (event *Event) Validate() error {
+	var message string
+
+	if event.ID == "" {
+		return errors.New("Error: uninitialized event")
+	}
+
+	if event.Source == "" {
+		message += " source field "
+	}
+
+	if event.Measurement == "" {
+		message += " measurement field "
+	}
+
+	if event.Timestamp.IsZero() {
+		message += " timestamp field "
+	}
+
+	if event.Data == nil {
+		message += " data field "
+	}
+
+	if message != "" {
+		return errors.New("Error: event missing "+message)
+	}
+	return nil
+}
