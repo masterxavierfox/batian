@@ -18,7 +18,7 @@ func TestNewEvent(t *testing.T){
 	db, _ := models.NewDbManager(tempDb)
 	newEvent := NewEvent(db)
 
-	var goodParams = `{ "source":"brandsight.com", 
+	var goodParams = `[{ "source":"brandsight.com", 
 						"measurement": "exceptions", 
 						"timestamp": "2016-06-14T13:55:01.000Z", 
 						"data": { 
@@ -27,9 +27,9 @@ func TestNewEvent(t *testing.T){
 							"path": "/ap1/v1/projects", 
 							"method": "GET" 
 							} 
-						}`
+						}]`
 
-	var malformedParams = `{ "invalid":"fields" }`
+	var malformedParams = `[{ "invalid":"fields" }]`
 
 	request, response := generateRequest("POST", "/api/v1/event", malformedParams)
 

@@ -1,6 +1,8 @@
 package handlers
 
 import (
+	"fmt"
+	"io/ioutil"
 	"net/http"
 	"encoding/json"
 	"github.com/ishuah/batian/models"
@@ -8,20 +10,21 @@ import (
 
 func NewEvent(db *models.DbManager) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		decoder := json.NewDecoder(r.Body)
-		event := models.InitEvent()
-		err := decoder.Decode(&event)
+		events := make(models.Events, 0)
+		body, _ := ioutil.ReadAll(r.Body)
 
-		if err != nil {
-			http.Error(w, err.Error(), 500)
-			return
-		}
+		json.Unmarshal(body, &events)
+		fmt.Printf("%#s", events[0].Timestamp)
+		for _, event := range events {
 
-		err = db.NewEvent(event)
+			event.Init()
 
-		if err != nil {
-			http.Error(w, err.Error(), 500)
-			return
+			err := db.NewEvent(event)
+
+			if err != nil {
+				http.Error(w, err.Error(), 500)
+				return
+			}
 		}
 
 		w.WriteHeader(200)

@@ -24,6 +24,10 @@ func InitEvent() Event {
 	return Event{ ID: bson.NewObjectId() }
 }
 
+func (event *Event) Init() {
+	event.ID = bson.NewObjectId()
+}
+
 func (event *Event) Validate() error {
 	var message string
 
