@@ -31,7 +31,7 @@ func TestNewEvent(t *testing.T){
 
 	var malformedParams = `[{ "invalid":"fields" }]`
 
-	request, response := generateRequest("POST", "/api/v1/event", malformedParams)
+	request, response := generateRequest("POST", "/log", malformedParams)
 
 	newEvent(response, request)
 
