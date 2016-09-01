@@ -30,15 +30,3 @@ func NewEvent(db *models.DbManager) http.HandlerFunc {
 		w.WriteHeader(200)
 	})
 }
-
-func AllEvents(db *models.DbManager) http.HandlerFunc {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		events,err := db.AllEvents()
-		if err != nil {
-			http.Error(w, err.Error(), 500)
-			return
-		}
-		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(events)
-		})
-}

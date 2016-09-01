@@ -39,33 +39,12 @@ func TestNewEvent(t *testing.T){
 		t.Fatalf("Non-expected status code %v:\n\tbody: %v ", "500", response.Code)
 	}
 
-	request, response = generateRequest("POST", "/api/v1/event", goodParams)
+	request, response = generateRequest("POST", "/log", goodParams)
 	
 	newEvent(response, request)
 	
 	if response.Code != http.StatusOK {
 		t.Fatalf("Non-expected status code %v:\n\tbody: %v ", "200", response.Code)
-	}
-
-	db.Close()
-	os.Remove(tempDb)
-}
-
-func TestAllEvents(t *testing.T){
-	tempDb := createTempFile()
-	if tempDb == "" {
-		t.Skip("Cannot create temp file")
-	}
-	db, _ := models.NewDbManager(tempDb)
-
-	allEvents := AllEvents(db)
-
-	request, response := generateRequest("GET", "/api/v1/event", "")
-
-	allEvents(response, request)
-
-	if response.Code != http.StatusOK {
-		t.Fatalf("Non-expected status code%v:\n\tbody: %v ", "200", response.Code)
 	}
 
 	db.Close()

@@ -38,19 +38,11 @@ func NewRouter(routes Routes) *mux.Router {
 
 func BuildRoutes(db *models.DbManager) Routes {
 	return Routes{
-
 			Route{
 				"NewEvent",
 				"POST",
-				"/api/v1/event",
+				"/log",
 				handlers.NewEvent(db),
-			},
-
-			Route{
-				"AllEvents",
-				"GET",
-				"/api/v1/event",
-				handlers.AllEvents(db),
 			},
 		}
 }
