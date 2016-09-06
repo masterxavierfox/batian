@@ -6,10 +6,6 @@ import (
 	"gopkg.in/mgo.v2/bson"
 	)
 
-type Model interface {
-	Save() bool
-}
-
 type Event struct {
 	ID			bson.ObjectId `storm:"id"`
 	Source		string `storm:"index"`
