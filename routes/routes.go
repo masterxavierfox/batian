@@ -44,5 +44,17 @@ func BuildRoutes(db *models.DbManager) Routes {
 				"/log",
 				handlers.NewEvent(db),
 			},
+			Route{
+				"ListApps",
+				"GET",
+				"/api/v1/app",
+				handlers.AllApps(db),
+			},
+			Route{
+				"NewApp",
+				"POST",
+				"/api/v1/app",
+				handlers.NewApp(db),
+			},
 		}
 }

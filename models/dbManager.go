@@ -1,6 +1,7 @@
 package models
 
 import (
+	"errors"
 	"github.com/asdine/storm"
 )
 
@@ -11,6 +12,7 @@ type DbManager struct {
 func NewDbManager(path string) (*DbManager, error) {
 	db, err := storm.Open(path)
 	db.Init(&Event{})
+	db.Init(&App{})
 	if err != nil {
 		return nil, err
 	}
@@ -26,8 +28,32 @@ func (m *DbManager) NewEvent(event Event) error {
 	if err != nil {
 		return err
 	}
+	var app App
+	err = m.db.One("ID", event.AppID, &app)
+	if err != nil {
+		return errors.New("Error: AppID provided does not exist")
+	}
 	err = m.db.Save(&event)
 	return err
+}
+
+func (m *DbManager) NewApp(app App) error {
+	err := app.Validate()
+	if err != nil {
+		return err
+	}
+
+	err = m.db.Save(&app)
+	return err
+}
+
+func (m *DbManager) AllApps() (Apps, error) {
+	var apps Apps
+	err := m.db.All(&apps)
+	if err != nil {
+		return nil, err
+	}
+	return apps, nil
 }
 
 func (m *DbManager) AllEvents() (Events, error) {

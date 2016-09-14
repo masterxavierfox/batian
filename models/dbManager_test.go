@@ -9,14 +9,20 @@ import (
 )
 
 func TestNewDbManager(t *testing.T) {
-	tempDb := createTempFile()
-	if tempDb == "" {
-		t.Skip("Cannot create temp file")
-	}
+	tempDb, m := initializeDatabase(t)
 
-	m, err := NewDbManager(tempDb)
+	m.Close()
+	os.Remove(tempDb)
+
+}
+
+func TestNewApp(t *testing.T) {
+	tempDb, m := initializeDatabase(t)
+
+	_, err := createApp(m)
+
 	if err != nil {
-		t.Errorf("Error when calling NewDbManager: %v", err)
+		t.Errorf("app not created")
 	}
 
 	m.Close()
@@ -24,20 +30,30 @@ func TestNewDbManager(t *testing.T) {
 
 }
 
-func TestNewEvent(t *testing.T) {
-	tempDb := createTempFile()
-	if tempDb == "" {
-		t.Skip("Cannot create temp file")
-	}
+func TestAllApps(t *testing.T){
+	tempDb, m := initializeDatabase(t)
+	_, _ = createApp(m)
+	_, _ = createApp(m)
 
-	m, err := NewDbManager(tempDb)
+	apps,err := m.AllApps()
 
 	if err != nil {
-		t.Errorf("Error when calling NewDbManager: %v", err)
+		t.Errorf("%v", err)
+	}
+	if len(apps) != 2 {
+		t.Errorf("Expected 2 apps. Recieved %v", len(apps))
 	}
 
+	m.Close()
+	os.Remove(tempDb)
+}
+
+func TestNewEvent(t *testing.T) {
+	tempDb, m := initializeDatabase(t)
+	app, err := createApp(m)
 	var event = Event{
 		bson.NewObjectId(),
+		app.ID,
 		"batian.io",
 		"requests",
 		time.Now(),
@@ -52,7 +68,7 @@ func TestNewEvent(t *testing.T) {
 	err = m.NewEvent(event)
 
 	if err != nil {
-		t.Errorf("event not created")
+		t.Errorf(err.Error())
 	}
 
 	m.Close()
@@ -60,15 +76,11 @@ func TestNewEvent(t *testing.T) {
 }
 
 func TestAllEvents(t *testing.T) {
-	tempDb := createTempFile()
-	if tempDb == "" {
-		t.Skip("Cannot create temp file")
-	}
-
-	m, err := NewDbManager(tempDb)
-
+	tempDb, m := initializeDatabase(t)
+	app, err := createApp(m)
 	event1 := Event{
 		bson.NewObjectId(),
+		app.ID,
 		"batian.io",
 		"requests",
 		time.Now(),
@@ -82,6 +94,7 @@ func TestAllEvents(t *testing.T) {
 
 	event2 := Event{
 		bson.NewObjectId(),
+		app.ID,
 		"batian.io",
 		"queries",
 		time.Now(),
@@ -105,7 +118,7 @@ func TestAllEvents(t *testing.T) {
 
 	m.Close()
 	os.Remove(tempDb)
-} 
+}
 
 func createTempFile() string {
 	tmpDirPath := os.TempDir()
@@ -115,4 +128,32 @@ func createTempFile() string {
 	}
 	f.Close()
 	return f.Name()
+}
+
+func initializeDatabase(t *testing.T) (string, *DbManager) {
+	tempDb := createTempFile()
+	if tempDb == "" {
+		t.Skip("Cannot create temp file")
+	}
+
+	m, err := NewDbManager(tempDb)
+
+	if err != nil {
+		t.Errorf("Error when calling NewDbManager: %v", err)
+	}
+
+	return tempDb, m
+}
+
+func createApp(m *DbManager) (App, error) {
+	var app = App{
+		bson.NewObjectId(),
+		"batian.io",
+		"JumpingJacks",
+		"Golang",
+		time.Now(),
+	}
+
+	err := m.NewApp(app)
+	return app, err
 }

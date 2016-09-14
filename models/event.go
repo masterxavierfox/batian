@@ -8,6 +8,7 @@ import (
 
 type Event struct {
 	ID			bson.ObjectId `storm:"id"`
+	AppID		bson.ObjectId `storm:"index"`
 	Source		string `storm:"index"`
 	Measurement	string `storm:"index"`
 	Timestamp	time.Time `storm:"index"`
@@ -29,6 +30,10 @@ func (event *Event) Validate() error {
 
 	if event.ID == "" {
 		return errors.New("Error: uninitialized event")
+	}
+
+	if event.AppID == "" {
+		return errors.New("Error: event missing AppID")
 	}
 
 	if event.Source == "" {

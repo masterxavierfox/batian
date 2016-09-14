@@ -1,22 +1,30 @@
 package models
 
 import (
+	"gopkg.in/mgo.v2/bson"
 	"testing"
 	"encoding/json"
 	"strings"
+	"time"
 )
 
 func TestEvent(t *testing.T) {
-	eventJson := `{ "source":"brandsight.com", 
-					"measurement": "exceptions", 
-					"timestamp": "2016-06-14T13:55:01.000Z", 
-					"data": { 
-						"status_code": 500, 
-						"message": "Does not compute", 
-						"path": "/ap1/v1/projects", 
-						"method": "GET" 
-						}
-					}`
+	app, err := bundleApp(`{ "name": "batian.io", "framework": "JumpinJacks", "language": "Golang" }`)
+
+	eventJson, err := json.Marshal(Event{
+		bson.NewObjectId(),
+		app.ID,
+		"batian.io",
+		"requests",
+		time.Now(),
+		bson.M{
+			"message": "Does not compute",
+			"method": "GET",
+			"path": "/ap1/v1/events",
+			"status_code": 500,
+		},
+	})
+
 
 	malformedEventJson := `{ }`
 
@@ -31,8 +39,8 @@ func TestEvent(t *testing.T) {
 	if err == nil {
 		t.Errorf("Malformed event passed validation")
 	}
-	
-	event, err = bundleEvent(eventJson)
+
+	event, err = bundleEvent(string(eventJson[:]))
 
 	if err != nil {
 		t.Errorf("Non expected error when bundling event: %v ", err.Error())
