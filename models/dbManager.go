@@ -10,12 +10,10 @@ type DbManager struct {
 }
 
 func NewDbManager(path string) (*DbManager, error) {
-	db, err := storm.Open(path)
+	db, _ := storm.Open(path)
 	db.Init(&Event{})
 	db.Init(&App{})
-	if err != nil {
-		return nil, err
-	}
+	
 	return &DbManager{db}, nil
 }
 

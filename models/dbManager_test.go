@@ -19,7 +19,21 @@ func TestNewDbManager(t *testing.T) {
 func TestNewApp(t *testing.T) {
 	tempDb, m := initializeDatabase(t)
 
-	_, err := createApp(m)
+	var app = App{
+		bson.NewObjectId(),
+		"",
+		"",
+		"",
+		time.Time{},
+	}
+
+	err := m.NewApp(app)
+
+	if err == nil {
+		t.Errorf("Persisted app with invalid parameters")
+	}
+
+	_, err = createApp(m)
 
 	if err != nil {
 		t.Errorf("app not created")
@@ -51,9 +65,10 @@ func TestAllApps(t *testing.T){
 func TestNewEvent(t *testing.T) {
 	tempDb, m := initializeDatabase(t)
 	app, err := createApp(m)
-	var event = Event{
+
+	badEvent1 := Event{
 		bson.NewObjectId(),
-		app.ID,
+		bson.NewObjectId(),
 		"batian.io",
 		"requests",
 		time.Now(),
@@ -65,11 +80,48 @@ func TestNewEvent(t *testing.T) {
 	    },
 	}
 
-	err = m.NewEvent(event)
+	err = m.NewEvent(badEvent1)
+
+	if err == nil {
+		t.Errorf("Persisted event with invalid AppID")
+	}
+
+	badEvent2 := Event{
+		bson.NewObjectId(),
+		"",
+		"",
+		"",
+		time.Time{},
+		nil,
+	}
+
+	err = m.NewEvent(badEvent2)
+
+	if err == nil {
+		t.Errorf("Persisted event with invalid parameters")
+	}
+
+	goodEvent := Event{
+		bson.NewObjectId(),
+		app.ID,
+		"batian.io",
+		"requests",
+		time.Now(),
+		bson.M{
+			"message": "Does not compute",
+			"method": "GET",
+			"path": "/ap1/v1/events",
+			"status_code": 500,
+		},
+	}
+
+	err = m.NewEvent(goodEvent)
 
 	if err != nil {
 		t.Errorf(err.Error())
 	}
+
+
 
 	m.Close()
 	os.Remove(tempDb)

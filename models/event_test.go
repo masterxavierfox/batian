@@ -26,9 +26,16 @@ func TestEvent(t *testing.T) {
 	})
 
 
-	malformedEventJson := `{ }`
+	malformedEventJson, err := json.Marshal(Event{
+		"",
+		"",
+		"",
+		"",
+		time.Time{},
+		nil,
+	})
 
-	event, err := bundleEvent(malformedEventJson)
+	event, err := bundleEvent(string(malformedEventJson[:]))
 
 	if err != nil {
 		t.Errorf("Non expected error when bundling event: %v ", err.Error())
