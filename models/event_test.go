@@ -26,7 +26,7 @@ func TestEvent(t *testing.T) {
 	})
 
 
-	malformedEventJson, err := json.Marshal(Event{
+	malformedEventJson1, err := json.Marshal(Event{
 		"",
 		"",
 		"",
@@ -35,7 +35,28 @@ func TestEvent(t *testing.T) {
 		nil,
 	})
 
-	event, err := bundleEvent(string(malformedEventJson[:]))
+	malformedEventJson2, err := json.Marshal(Event{
+		bson.NewObjectId(),
+		app.ID,
+		"",
+		"",
+		time.Time{},
+		nil,
+	})
+
+	event, err := bundleEvent(string(malformedEventJson1[:]))
+
+	if err != nil {
+		t.Errorf("Non expected error when bundling event: %v ", err.Error())
+	}
+
+	err = event.Validate()
+
+	if err == nil {
+		t.Errorf("Malformed event passed validation")
+	}
+
+	event, err = bundleEvent(string(malformedEventJson2[:]))
 
 	if err != nil {
 		t.Errorf("Non expected error when bundling event: %v ", err.Error())
