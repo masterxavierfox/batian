@@ -122,3 +122,15 @@ func UpdateApp(db *models.DbManager) http.HandlerFunc {
 		json.NewEncoder(w).Encode(app)
 	})
 }
+
+func DeleteApp(db *models.DbManager) http.HandlerFunc {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		params := mux.Vars(r)
+		err := db.DeleteApp(params["appID"])
+		if err != nil {
+			http.Error(w, err.Error(), 500)
+			return
+		}
+		w.WriteHeader(204)
+	})
+}

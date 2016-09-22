@@ -55,6 +55,22 @@ func (m *DbManager) GetApp(appID string) (App, error) {
 	return app, nil
 }
 
+func (m *DbManager) DeleteApp(appID string) error {
+	var app App
+
+	err := m.db.One("ID", bson.ObjectIdHex(appID), &app)
+	if err != nil {
+		return err
+	}
+
+	err = m.db.DeleteStruct(&app)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (m *DbManager) UpdateApp(app App) error {
 	err := app.Validate()
 	if err != nil {
