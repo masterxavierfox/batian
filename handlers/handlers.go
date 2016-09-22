@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"encoding/json"
+	"github.com/gorilla/mux"
 	"github.com/ishuah/batian/models"
 )
 
@@ -28,6 +29,12 @@ func NewEvent(db *models.DbManager) http.HandlerFunc {
 		}
 
 		w.WriteHeader(200)
+	})
+}
+
+func Analysis(db *models.DbManager) http.HandlerFunc {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+
 	})
 }
 
@@ -60,7 +67,58 @@ func NewApp(db *models.DbManager) http.HandlerFunc {
 			http.Error(w, err.Error(), 500)
 			return
 		}
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(app)
+	})
+}
 
-		w.WriteHeader(200)
+func AppDetails(db *models.DbManager) http.HandlerFunc {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		params := mux.Vars(r)
+		app, err := db.GetApp(params["appID"])
+		if err != nil {
+			http.Error(w, err.Error(), 500)
+			return
+		}
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(app)
+	})
+}
+
+func UpdateApp(db *models.DbManager) http.HandlerFunc {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		var fields models.AppFields
+		var app models.App
+		decoder := json.NewDecoder(r.Body)
+		err := decoder.Decode(&fields)
+
+		if err != nil {
+			http.Error(w, err.Error(), 500)
+			return
+		}
+
+		params := mux.Vars(r)
+		app, err = db.GetApp(params["appID"])
+
+		if err != nil {
+			http.Error(w, err.Error(), 500)
+			return
+		}
+
+		err = app.Update(fields)
+
+		if err != nil {
+			http.Error(w, err.Error(), 500)
+			return
+		}
+
+		err = db.UpdateApp(app)
+
+		if err != nil {
+			http.Error(w, err.Error(), 500)
+			return
+		}
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(app)
 	})
 }

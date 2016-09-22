@@ -3,6 +3,7 @@ package models
 import (
 	"errors"
 	"github.com/asdine/storm"
+	"gopkg.in/mgo.v2/bson"
 )
 
 type DbManager struct {
@@ -42,6 +43,25 @@ func (m *DbManager) NewApp(app App) error {
 	}
 
 	err = m.db.Save(&app)
+	return err
+}
+
+func (m *DbManager) GetApp(appID string) (App, error) {
+	var app App
+	err := m.db.One("ID", bson.ObjectIdHex(appID), &app)
+	if err != nil {
+		return app, err
+	}
+	return app, nil
+}
+
+func (m *DbManager) UpdateApp(app App) error {
+	err := app.Validate()
+	if err != nil {
+		return err
+	}
+
+	err = m.db.Update(&app)
 	return err
 }
 
