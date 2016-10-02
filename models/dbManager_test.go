@@ -127,50 +127,6 @@ func TestNewEvent(t *testing.T) {
 	os.Remove(tempDb)
 }
 
-func TestAllEvents(t *testing.T) {
-	tempDb, m := initializeDatabase(t)
-	app, err := createApp(m)
-	event1 := Event{
-		bson.NewObjectId(),
-		app.ID,
-		"batian.io",
-		"requests",
-		time.Now(),
-		bson.M{
-	      "message": "Does not compute",
-	      "method": "GET",
-	      "path": "/ap1/v1/events",
-	      "status_code": 500,
-	    },
-	}
-
-	event2 := Event{
-		bson.NewObjectId(),
-		app.ID,
-		"batian.io",
-		"queries",
-		time.Now(),
-		bson.M{
-	      "latency": "0.2328",
-	      "query": "select * from projects",
-	    },
-	}
-
-	m.NewEvent(event1)
-	m.NewEvent(event2)
-
-	events,err := m.AllEvents()
-
-	if err != nil {
-		t.Errorf("%v", err)
-	}
-	if len(events) != 2 {
-		t.Errorf("Expected 2 events. Recieved %v", len(events))
-	}
-
-	m.Close()
-	os.Remove(tempDb)
-}
 
 func createTempFile() string {
 	tmpDirPath := os.TempDir()
