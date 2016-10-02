@@ -1,6 +1,7 @@
 package models
 
 import (
+	"time"
 	"errors"
 	"github.com/asdine/storm"
 	"gopkg.in/mgo.v2/bson"
@@ -90,9 +91,11 @@ func (m *DbManager) AllApps() (Apps, error) {
 	return apps, nil
 }
 
-func (m *DbManager) AllEvents() (Events, error) {
+func (m *DbManager) GetAppEvents(appID string, duration int) (Events, error) {
 	var events Events
-	err := m.db.AllByIndex("Timestamp", &events)
+	now := time.Now().UTC()
+	past := now.Add(time.Duration(duration) * time.Hour)
+	err := m.db.Range("Timestamp", past, now, &events)
 
 	if err != nil {
 		return nil, err

@@ -1,27 +1,37 @@
 package handlers
 
 import (
-	"fmt"
+	"strconv"
 	"io/ioutil"
 	"net/http"
 	"encoding/json"
 	"github.com/gorilla/mux"
 	"github.com/ishuah/batian/models"
+	"github.com/ishuah/batian/engines"
 )
 
 func NewEvent(db *models.DbManager) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		events := make(models.Events, 0)
-		body, _ := ioutil.ReadAll(r.Body)
+		body, err := ioutil.ReadAll(r.Body)
+
+		if err != nil {
+			http.Error(w, err.Error(), 500)
+			return
+		}
 
 		json.Unmarshal(body, &events)
-		fmt.Printf("%#s", events[0].Timestamp)
+
+		if len(events) == 0 {
+			http.Error(w, "Error: no events received", 500)
+			return
+		}
+
 		for _, event := range events {
 
 			event.Init()
 
-			err := db.NewEvent(event)
-
+			err = db.NewEvent(event)
 			if err != nil {
 				http.Error(w, err.Error(), 500)
 				return
@@ -29,12 +39,6 @@ func NewEvent(db *models.DbManager) http.HandlerFunc {
 		}
 
 		w.WriteHeader(200)
-	})
-}
-
-func Analysis(db *models.DbManager) http.HandlerFunc {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-
 	})
 }
 
@@ -132,5 +136,33 @@ func DeleteApp(db *models.DbManager) http.HandlerFunc {
 			return
 		}
 		w.WriteHeader(204)
+	})
+}
+
+func AppAnalysis(db *models.DbManager) http.HandlerFunc {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		params := mux.Vars(r)
+		duration, err := strconv.Atoi("-"+params["duration"])
+
+		if err != nil {
+			http.Error(w, err.Error(), 500)
+			return
+		}
+
+		var events models.Events
+		events, err = db.GetAppEvents(params["appID"], duration)
+		if err != nil {
+			if err.Error() == "not found" {
+				http.Error(w, "No events in the given time window.", 404)
+				return
+			}
+
+			http.Error(w, err.Error(), 500)
+			return
+		}
+
+		reports, err := engines.AppAnalysis(events)
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(reports)
 	})
 }

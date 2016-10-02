@@ -69,6 +69,12 @@ func BuildRoutes(db *models.DbManager) Routes {
 				handlers.DeleteApp(db),
 			},
 			Route{
+				"AppAnalysis",
+				"GET",
+				"/api/v1/app/{appID:[a-z0-9]+}/analysis/{duration:[0-9]+}",
+				handlers.AppAnalysis(db),
+			},
+			Route{
 				"NewApp",
 				"POST",
 				"/api/v1/app",
