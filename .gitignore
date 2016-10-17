@@ -27,3 +27,4 @@ _testmain.go
 *.sublime-*
 
 *.db
+*.DS_Store
