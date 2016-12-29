@@ -39,6 +39,12 @@ func NewRouter(routes Routes) *mux.Router {
 func BuildRoutes(db *models.DbManager) Routes {
 	return Routes{
 			Route{
+				"HandleWebSocket",
+				"GET",
+				"/ws",
+				handlers.HandleWebSocket(db),
+			},
+			Route{
 				"AppDashboard",
 				"GET",
 				"/",

@@ -45,47 +45,11 @@
                 </a>
             </div>
 
-            <ul class="nav">
-                <li class="active">
-                    <a href="dashboard.html">
-                        <i class="ti-panel"></i>
-                        <p>Dashboard</p>
-                    </a>
-                </li>
+            <ul id="applist" class="nav">
                 <li>
-                    <a href="user.html">
-                        <i class="ti-user"></i>
-                        <p>User Profile</p>
-                    </a>
-                </li>
-                <li>
-                    <a href="table.html">
-                        <i class="ti-view-list-alt"></i>
-                        <p>Table List</p>
-                    </a>
-                </li>
-                <li>
-                    <a href="typography.html">
-                        <i class="ti-text"></i>
-                        <p>Typography</p>
-                    </a>
-                </li>
-                <li>
-                    <a href="icons.html">
-                        <i class="ti-pencil-alt2"></i>
-                        <p>Icons</p>
-                    </a>
-                </li>
-                <li>
-                    <a href="maps.html">
-                        <i class="ti-map"></i>
-                        <p>Maps</p>
-                    </a>
-                </li>
-                <li>
-                    <a href="notifications.html">
-                        <i class="ti-bell"></i>
-                        <p>Notifications</p>
+                    <a href="#new-app">
+                        <i class="ti-plus"></i>
+                        <p>Add app</p>
                     </a>
                 </li>
             </ul>
@@ -249,17 +213,12 @@
                     <div class="col-md-12">
                         <div class="card">
                             <div class="header">
-                                <h4 class="title">Users Behavior</h4>
+                                <h4 class="title">Requests Per Minute (RPM)</h4>
                                 <p class="category">24 Hours performance</p>
                             </div>
                             <div class="content">
-                                <div id="chartHours" class="ct-chart"></div>
+                                <div id="chartRPM" class="ct-chart"></div>
                                 <div class="footer">
-                                    <div class="chart-legend">
-                                        <i class="fa fa-circle text-info"></i> Open
-                                        <i class="fa fa-circle text-danger"></i> Click
-                                        <i class="fa fa-circle text-warning"></i> Click Second Time
-                                    </div>
                                     <hr>
                                     <div class="stats">
                                         <i class="ti-reload"></i> Updated 3 minutes ago
@@ -373,24 +332,24 @@
     <!-- Paper Dashboard Core javascript and methods for Demo purpose -->
   <script src="assets/js/paper-dashboard.js"></script>
 
-  <!-- Paper Dashboard DEMO methods, don't include it in your project! -->
+  <script src="assets/js/app.js"></script>
   <script src="assets/js/demo.js"></script>
 
   <script type="text/javascript">
-      $(document).ready(function(){
+    $(document).ready(function(){
 
-          demo.initChartist();
+      demo.initChartist();
 
-          $.notify({
-              icon: 'ti-gift',
-              message: "Welcome to <b>Paper Dashboard</b> - a beautiful Bootstrap freebie for your next project."
+      $.notify({
+          icon: 'ti-gift',
+          message: "Welcome to <b>Paper Dashboard</b> - a beautiful Bootstrap freebie for your next project."
 
-            },{
-                type: 'success',
-                timer: 4000
-            });
+        },{
+            type: 'success',
+            timer: 4000
+        });
 
-      });
+    });
   </script>
 
 </html>
