@@ -5,6 +5,7 @@ import (
 	"net/http/httptest"
 	"net/http"
 	"github.com/ishuah/batian/models"
+	"github.com/gorilla/mux"
 	"gopkg.in/mgo.v2/bson"
 	"encoding/json"
 	"os"
@@ -12,68 +13,6 @@ import (
 	"strings"
 	"io/ioutil"
 )
-
-func TestNewApp(t *testing.T){
-	tempDb := createTempFile()
-	if tempDb == "" {
-		t.Skip("Cannot create temp file")
-	}
-	db, _ := models.NewDbManager(tempDb)
-
-	newApp := NewApp(db)
-
-	goodParams := `{ "name": "batian.io", "framework": "JumpinJacks", "language": "Golang" }`
-
-	var malformedParams = `[{ "invalid":"fields" }]`
-
-	request, response := generateRequest("POST", "/api/v1/app", malformedParams)
-
-	newApp(response, request)
-
-	if response.Code != http.StatusInternalServerError {
-		t.Fatalf("Non-expected status code %v:\n\tbody: %v ", "500", response.Code)
-	}
-
-	request, response = generateRequest("POST", "/api/v1/app", goodParams)
-
-	newApp(response, request)
-
-	if response.Code != http.StatusOK {
-		t.Fatalf("Non-expected status code %v:\n\tbody: %v ", "200", response.Code)
-	}
-
-	db.Close()
-	os.Remove(tempDb)
-}
-
-func TestAllApps(t *testing.T){
-	tempDb, db := initDatabase(t)
-	app := models.App{
-		bson.NewObjectId(),
-		"batian.io",
-		"JumpingJacks",
-		"Golang",
-		time.Now(),
-	}
-
-	err := db.NewApp(app)
-
-	if err != nil {
-		t.Fatalf("Non-expected error while creating app %s", err.Error())
-	}
-
-	allApps := AllApps(db)
-	request, response := generateRequest("GET", "/api/v1/app", "")
-
-	allApps(response, request)
-
-	if response.Code != http.StatusOK {
-		t.Fatalf("Non-expected status code%v:\n\tbody: %v ",response.Code, response.Body)
-	}
-
-	db.Close()
-	os.Remove(tempDb)
-}
 
 func TestNewEvent(t *testing.T){
 	tempDb, db := initDatabase(t)
@@ -129,10 +68,138 @@ func TestNewEvent(t *testing.T){
 	os.Remove(tempDb)
 }
 
+func TestAllApps(t *testing.T){
+	tempDb, db := initDatabase(t)
+	app := models.App{
+		bson.NewObjectId(),
+		"batian.io",
+		"JumpingJacks",
+		"Golang",
+		time.Now(),
+	}
+
+	err := db.NewApp(app)
+
+	if err != nil {
+		t.Fatalf("Non-expected error while creating app %s", err.Error())
+	}
+
+	allApps := AllApps(db)
+	request, response := generateRequest("GET", "/api/v1/app", "")
+
+	allApps(response, request)
+
+	if response.Code != http.StatusOK {
+		t.Fatalf("Non-expected status code%v:\n\tbody: %v ",response.Code, response.Body)
+	}
+
+	db.Close()
+	os.Remove(tempDb)
+}
+
+func TestNewApp(t *testing.T){
+	tempDb, db := initDatabase(t)
+
+	newApp := NewApp(db)
+
+	goodParams := `{ "name": "batian.io", "framework": "JumpinJacks", "language": "Golang" }`
+
+	var malformedParams = `[{ "invalid":"fields" }]`
+
+	request, response := generateRequest("POST", "/api/v1/app", malformedParams)
+
+	newApp(response, request)
+
+	if response.Code != http.StatusInternalServerError {
+		t.Fatalf("Non-expected status code %v:\n\tbody: %v ", "500", response.Code)
+	}
+
+	request, response = generateRequest("POST", "/api/v1/app", goodParams)
+
+	newApp(response, request)
+
+	if response.Code != http.StatusOK {
+		t.Fatalf("Non-expected status code %v:\n\tbody: %v ", "200", response.Code)
+	}
+
+	db.Close()
+	os.Remove(tempDb)
+}
+
+func TestAppDetails(t *testing.T){
+	tempDb, db := initDatabase(t)
+	appDetails := AppDetails(db)
+	appId := bson.NewObjectId()
+	
+	app := models.App{
+		appId,
+		"batian.io",
+		"JumpingJacks",
+		"Golang",
+		time.Now(),
+	}
+
+	err := db.NewApp(app)
+
+	if err != nil {
+		t.Fatalf("Non-expected error while creating app %s", err.Error())
+	}
+
+	request, response := generateRequest("GET", "/api/v1/app/"+appId.Hex(), "")
+	
+	m := mux.NewRouter()
+	m.HandleFunc("/api/v1/app/{appID:[a-z0-9]+}", appDetails)
+
+	m.ServeHTTP(response, request)
+
+	
+	if response.Code != http.StatusOK {
+		t.Fatalf("Non-expected status code %v:\n\tbody: %v ", "200", response.Code)
+	}
+
+	db.Close()
+	os.Remove(tempDb)
+}
+
+func TestUpdateApp(t *testing.T) {
+	tempDb, db := initDatabase(t)
+	updateApp := UpdateApp(db)
+	appId := bson.NewObjectId()
+
+	app := models.App{
+		appId,
+		"batian.io",
+		"JumpingJacks",
+		"Golang",
+		time.Now(),
+	}
+
+	err := db.NewApp(app)
+
+	if err != nil {
+		t.Fatalf("Non-expected error while creating app %s", err.Error())
+	}
+
+	request, response := generateRequest("PUT", "/api/v1/app/"+appId.Hex(), `{ "framework": "Rails", "language": "Ruby" }`)
+	
+	m := mux.NewRouter()
+	m.HandleFunc("/api/v1/app/{appID:[a-z0-9]+}", updateApp)
+
+	m.ServeHTTP(response, request)
+	
+	if response.Code != http.StatusOK {
+		t.Fatalf("Non-expected status code %v:\n\tbody: %v ", "200", response.Code)
+	}
+
+	db.Close()
+	os.Remove(tempDb)
+}
+
+
 func generateRequest(method string, url string, params string) (*http.Request,*httptest.ResponseRecorder){
 	request, _ := http.NewRequest(method, url, strings.NewReader(params))
+	
 	response := httptest.NewRecorder()
-
 	return request, response
 }
 

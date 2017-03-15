@@ -79,6 +79,7 @@ func NewApp(db *models.DbManager) http.HandlerFunc {
 func AppDetails(db *models.DbManager) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		params := mux.Vars(r)
+		
 		app, err := db.GetApp(params["appID"])
 		if err != nil {
 			http.Error(w, err.Error(), 500)
