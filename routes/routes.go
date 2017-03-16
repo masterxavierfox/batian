@@ -51,10 +51,10 @@ func BuildRoutes(db *models.DbManager) Routes {
 				handlers.AllApps(db),
 			},
 			Route{
-				"AppDetails",
+				"ShowApp",
 				"GET",
 				"/api/v1/app/{appID:[a-z0-9]+}",
-				handlers.AppDetails(db),
+				handlers.ShowApp(db),
 			},
 			Route{
 				"UpdateApp",

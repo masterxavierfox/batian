@@ -76,7 +76,7 @@ func NewApp(db *models.DbManager) http.HandlerFunc {
 	})
 }
 
-func AppDetails(db *models.DbManager) http.HandlerFunc {
+func ShowApp(db *models.DbManager) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		params := mux.Vars(r)
 		
