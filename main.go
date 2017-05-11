@@ -13,10 +13,9 @@ func main() {
 
 	defer termbox.Close()
 
-	s := Screen{ pos: 0 }
+	s := screen{ pos: 0 }
 
-	s.Load()
-	s.Draw()
+	s.load()
 
 	for {
 		switch ev := termbox.PollEvent(); ev.Type {
@@ -25,11 +24,11 @@ func main() {
 			case termbox.KeyEsc:
 				return
 			case termbox.KeyArrowUp:
-				s.MoveUp()
+				s.moveUp()
 			case termbox.KeyArrowDown:
-				s.MoveDown()
+				s.moveDown()
 			default:
-				s.Draw()
+				s.draw()
 			}
 		}
 	}

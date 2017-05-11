@@ -6,12 +6,12 @@ import (
 	"os"
 )
 
-type Screen struct {
+type screen struct {
   buffer  [][]rune
   pos     int
 }
 
-func (s *Screen) Draw() {
+func (s *screen) draw() {
   termbox.Clear(termbox.ColorDefault, termbox.ColorDefault)
 
   _, height := termbox.Size()
@@ -26,24 +26,28 @@ func (s *Screen) Draw() {
   termbox.Flush()
 }
 
-func (s *Screen) Load() {
+func (s *screen) load() {
   scanner := bufio.NewScanner(os.Stdin)
+  _, height := termbox.Size()
   for scanner.Scan(){
     s.buffer = append(s.buffer, []rune(scanner.Text()))
+    if len(s.buffer) == height {
+      s.draw()
+    }
   }
 }
 
-func (s *Screen) MoveUp() {
+func (s *screen) moveUp() {
   if s.pos > 0 {
     s.pos -= 1
-    s.Draw()
+    s.draw()
   }
 }
 
-func (s *Screen) MoveDown() {
+func (s *screen) moveDown() {
   _, height := termbox.Size()
   if len(s.buffer) > height && s.pos < (len(s.buffer) - height) {
     s.pos += 1
-    s.Draw()
+    s.draw()
   }
 }
