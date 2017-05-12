@@ -19,7 +19,13 @@ func (s *screen) draw() {
   termbox.Clear(termbox.ColorDefault, termbox.ColorDefault)
 
   _, height := termbox.Size()
-  lines := s.buffer[s.scrollPos:(height+s.scrollPos)]
+  var lines [][]rune
+  if len(s.buffer) < height {
+    lines = s.buffer
+  } else {
+    lines = s.buffer[s.scrollPos:(height+s.scrollPos)]
+  }
+
 
   for y, runes := range lines {
    for x, char := range runes {
