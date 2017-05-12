@@ -7,20 +7,24 @@ import (
 )
 
 type screen struct {
-  buffer  [][]rune
-  pos     int
+  buffer        [][]rune
+  scrollPos     int
+}
+
+func initScreen() screen {
+  return screen{ scrollPos: 0 }
 }
 
 func (s *screen) draw() {
   termbox.Clear(termbox.ColorDefault, termbox.ColorDefault)
 
   _, height := termbox.Size()
-  lines := s.buffer[s.pos:(height+s.pos)]
+  lines := s.buffer[s.scrollPos:(height+s.scrollPos)]
 
   for y, runes := range lines {
-    for x, char := range runes {
-      termbox.SetCell(x, y, char, termbox.ColorDefault, termbox.ColorDefault)
-    }
+   for x, char := range runes {
+     termbox.SetCell(x, y, char, termbox.ColorDefault, termbox.ColorDefault)
+   }
   }
 
   termbox.Flush()
@@ -29,25 +33,52 @@ func (s *screen) draw() {
 func (s *screen) load() {
   scanner := bufio.NewScanner(os.Stdin)
   _, height := termbox.Size()
-  for scanner.Scan(){
-    s.buffer = append(s.buffer, []rune(scanner.Text()))
-    if len(s.buffer) == height {
+
+  go func() {
+    rendered := false
+    for scanner.Scan(){
+      s.buffer = append(s.buffer, []rune(scanner.Text()))
+
+      if len(s.buffer) == height {
+        s.draw()
+        rendered = true
+      }
+    }
+    if !rendered {
       s.draw()
     }
-  }
+  }()
 }
 
 func (s *screen) moveUp() {
-  if s.pos > 0 {
-    s.pos -= 1
+  if s.scrollPos > 0 {
+    s.scrollPos -= 1
     s.draw()
   }
 }
 
 func (s *screen) moveDown() {
   _, height := termbox.Size()
-  if len(s.buffer) > height && s.pos < (len(s.buffer) - height) {
-    s.pos += 1
+  if len(s.buffer) > height && s.scrollPos < (len(s.buffer) - height) {
+    s.scrollPos += 1
     s.draw()
   }
+}
+
+func (s *screen) loop() {
+  for {
+		switch ev := termbox.PollEvent(); ev.Type {
+		case termbox.EventKey:
+			switch ev.Key {
+			case termbox.KeyEsc:
+				return
+			case termbox.KeyArrowUp:
+				s.moveUp()
+			case termbox.KeyArrowDown:
+				s.moveDown()
+			default:
+				s.draw()
+			}
+		}
+	}
 }
