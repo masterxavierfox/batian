@@ -29,7 +29,7 @@ func (s *screen) draw() {
 
   for y, runes := range lines {
    for x, char := range runes {
-     termbox.SetCell(x, y, char, termbox.ColorDefault, termbox.ColorDefault)
+     termbox.SetCell(x, y, char, termbox.ColorRed, termbox.ColorDefault)
    }
   }
 
