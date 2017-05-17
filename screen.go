@@ -18,10 +18,19 @@ func initScreen() screen {
 }
 
 func (s *screen) draw() {
+  width, height := termbox.Size()
   for {
     runes := <- s.view
-    for x, char := range runes {
-      termbox.SetCell(x, s.cursorPos, char, termbox.ColorDefault, termbox.ColorDefault)
+    x := 0
+    for _, char := range runes {
+      if s.cursorPos < (height-1) {
+        termbox.SetCell(x, s.cursorPos, char, termbox.ColorDefault, termbox.ColorDefault)
+      }
+      x += 1
+      if x > width {
+        s.cursorPos += 1
+        x = 2
+      }
     }
     s.cursorPos += 1
     termbox.Flush()
@@ -48,7 +57,8 @@ func (s *screen) load() {
   go func() {
     for scanner.Scan() {
       s.buffer = append(s.buffer, []rune(scanner.Text()))
-      if len(s.buffer) < height {
+
+      if s.cursorPos < (height-1) {
         s.view <- s.buffer[len(s.buffer)-1]
       }
     }
