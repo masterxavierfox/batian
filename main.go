@@ -15,6 +15,6 @@ func main() {
 	s := initScreen()
 
 	s.load()
-
+	go s.draw()
 	s.loop()
 }

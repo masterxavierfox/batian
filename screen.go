@@ -9,31 +9,36 @@ import (
 type screen struct {
   buffer        [][]rune
   scrollPos     int
+  cursorPos     int
+  view          chan []rune
 }
 
 func initScreen() screen {
-  return screen{ scrollPos: 0 }
+  return screen{ scrollPos: 0, view: make(chan []rune)}
 }
 
 func (s *screen) draw() {
+  for {
+    runes := <- s.view
+    for x, char := range runes {
+      termbox.SetCell(x, s.cursorPos, char, termbox.ColorRed, termbox.ColorDefault)
+    }
+    s.cursorPos += 1
+    termbox.Flush()
+  }
+}
+
+func (s *screen) reset() {
   termbox.Clear(termbox.ColorDefault, termbox.ColorDefault)
 
+  s.cursorPos = 0
   _, height := termbox.Size()
-  var lines [][]rune
-  if len(s.buffer) < height {
-    lines = s.buffer
-  } else {
-    lines = s.buffer[s.scrollPos:(height+s.scrollPos)]
+
+  lines := s.buffer[s.scrollPos:(height+s.scrollPos)]
+
+  for _, runes := range lines {
+    s.view <- runes
   }
-
-
-  for y, runes := range lines {
-   for x, char := range runes {
-     termbox.SetCell(x, y, char, termbox.ColorRed, termbox.ColorDefault)
-   }
-  }
-
-  termbox.Flush()
 }
 
 func (s *screen) load() {
@@ -41,17 +46,11 @@ func (s *screen) load() {
   _, height := termbox.Size()
 
   go func() {
-    rendered := false
-    for scanner.Scan(){
+    for scanner.Scan() {
       s.buffer = append(s.buffer, []rune(scanner.Text()))
-
-      if len(s.buffer) == height {
-        s.draw()
-        rendered = true
+      if len(s.buffer) <= height {
+        s.view <- s.buffer[len(s.buffer)-1]
       }
-    }
-    if !rendered {
-      s.draw()
     }
   }()
 }
@@ -59,7 +58,7 @@ func (s *screen) load() {
 func (s *screen) moveUp() {
   if s.scrollPos > 0 {
     s.scrollPos -= 1
-    s.draw()
+    s.reset()
   }
 }
 
@@ -67,7 +66,7 @@ func (s *screen) moveDown() {
   _, height := termbox.Size()
   if len(s.buffer) > height && s.scrollPos < (len(s.buffer) - height) {
     s.scrollPos += 1
-    s.draw()
+    s.reset()
   }
 }
 
@@ -82,8 +81,6 @@ func (s *screen) loop() {
 				s.moveUp()
 			case termbox.KeyArrowDown:
 				s.moveDown()
-			default:
-				s.draw()
 			}
 		}
 	}
