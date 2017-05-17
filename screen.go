@@ -21,7 +21,7 @@ func (s *screen) draw() {
   for {
     runes := <- s.view
     for x, char := range runes {
-      termbox.SetCell(x, s.cursorPos, char, termbox.ColorRed, termbox.ColorDefault)
+      termbox.SetCell(x, s.cursorPos, char, termbox.ColorDefault, termbox.ColorDefault)
     }
     s.cursorPos += 1
     termbox.Flush()
