@@ -34,7 +34,7 @@ func (s *screen) reset() {
   s.cursorPos = 0
   _, height := termbox.Size()
 
-  lines := s.buffer[s.scrollPos:(height+s.scrollPos)]
+  lines := s.buffer[s.scrollPos:(height+s.scrollPos)-1]
 
   for _, runes := range lines {
     s.view <- runes
@@ -48,7 +48,7 @@ func (s *screen) load() {
   go func() {
     for scanner.Scan() {
       s.buffer = append(s.buffer, []rune(scanner.Text()))
-      if len(s.buffer) <= height {
+      if len(s.buffer) < height {
         s.view <- s.buffer[len(s.buffer)-1]
       }
     }
